@@ -1,17 +1,28 @@
-import Card from '@/components/Card';
-import Sort from '@/components/Sort';
-import { getFiles } from '@/lib/actions/file.actions';
-import { getFileTypesParams } from '@/lib/utils';
-import { Models } from 'node-appwrite';
-import React from 'react';
+import React from "react";
+import Sort from "@/components/Sort";
+import { getFiles } from "@/lib/actions/file.actions";
+import { Models } from "node-appwrite";
+import Card from "@/components/Card";
+import { getFileTypesParams } from "@/lib/utils";
 
 const Page = async ({ searchParams, params }: SearchParamProps) => {
-  const type = ((await params)?.type as string) || '';
-  const searchText = ((await searchParams)?.query as string) || '';
-  const sort = ((await searchParams)?.sort as string) || '';
+  const type = ((await params)?.type as string) || "";
+  const searchText = ((await searchParams)?.query as string) || "";
+  const sort = ((await searchParams)?.sort as string) || "";
 
   const types = getFileTypesParams(type) as FileType[];
+
   const files = await getFiles({ types, searchText, sort });
+
+  
+  const totalSizeBytes = files.documents.reduce(
+    (acc: number, file: Models.Document) => acc + (file.size || 0),
+    0
+  );
+
+  
+  const totalSizeMB = (totalSizeBytes / (1024 * 1024)).toFixed(2);
+
   return (
     <div className="page-container">
       <section className="w-full">
@@ -19,20 +30,22 @@ const Page = async ({ searchParams, params }: SearchParamProps) => {
 
         <div className="total-size-section">
           <p className="body-1">
-            Total: <span className="h5">0 MB</span>
+            Total: <span className="h5">{totalSizeMB} MB</span>
           </p>
 
           <div className="sort-container">
-            <p className="body-1 hidden sm:block text-light-200">Sort by:</p>
+            <p className="body-1 hidden text-light-200 sm:block">Sort by:</p>
+
             <Sort />
           </div>
         </div>
       </section>
 
+      {/* Render the files */}
       {files.total > 0 ? (
         <section className="file-list">
           {files.documents.map((file: Models.Document) => (
-            <Card key={file.$id} file={file}/>
+            <Card key={file.$id} file={file} />
           ))}
         </section>
       ) : (
