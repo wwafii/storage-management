@@ -3,6 +3,7 @@ import React from 'react';
 import Search from './Search';
 import FileUploader from './FileUploader';
 import { signOutUser } from '@/lib/actions/user.actions';
+import { Button } from './ui/button';
 
 const Header = ({ userId, accountId }: { userId: string; accountId: string }) => {
   return (
@@ -16,9 +17,9 @@ const Header = ({ userId, accountId }: { userId: string; accountId: string }) =>
             await signOutUser();
           }}
         >
-          <button type="submit" className="sign-out-button">
+          <Button type="submit" className="sign-out-button">
             <Image src="/assets/icons/logout.svg" alt="logo" width={24} height={24} className="w-6" />
-          </button>
+          </Button>
         </form>
       </div>
     </header>
