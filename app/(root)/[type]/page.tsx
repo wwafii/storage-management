@@ -4,23 +4,35 @@ import { getFiles } from "@/lib/actions/file.actions";
 import { Models } from "node-appwrite";
 import Card from "@/components/Card";
 import { getFileTypesParams } from "@/lib/utils";
+import { notFound } from "next/navigation";
 
-const Page = async ({ searchParams, params }: SearchParamProps) => {
-  const type = ((await params)?.type as string) || "";
-  const searchText = ((await searchParams)?.query as string) || "";
-  const sort = ((await searchParams)?.sort as string) || "";
+type PageProps = {
+  searchParams: { query?: string; sort?: string };
+  params: { type?: string };
+};
+
+const validTypes = ['images', 'documents', 'media', 'others'];
+
+const Page = async ({ searchParams, params }: PageProps) => {
+  const type = params?.type || "";
+
+  
+  if (!validTypes.includes(type)) {
+    notFound();
+  }
 
   const types = getFileTypesParams(type) as FileType[];
 
+  const searchText = searchParams?.query || "";
+  const sort = searchParams?.sort || "";
+
   const files = await getFiles({ types, searchText, sort });
 
-  
   const totalSizeBytes = files.documents.reduce(
     (acc: number, file: Models.Document) => acc + (file.size || 0),
     0
   );
 
-  
   const totalSizeMB = (totalSizeBytes / (1024 * 1024)).toFixed(2);
 
   return (
@@ -41,7 +53,6 @@ const Page = async ({ searchParams, params }: SearchParamProps) => {
         </div>
       </section>
 
-      {/* Render the files */}
       {files.total > 0 ? (
         <section className="file-list">
           {files.documents.map((file: Models.Document) => (
