@@ -15,9 +15,9 @@ import { convertFileSize, getUsageSummary } from "@/lib/utils";
 const Dashboard = async () => {
   try {
     const client = await createSessionClient();
-    await client.account.get(); // cek validasi session user
+    await client.account.get(); 
   } catch (error) {
-    redirect('/sign-in'); // kalau session tidak ada, langsung redirect ke sign-in
+    redirect('/sign-in');
   }
   
   const [files, totalSpace] = await Promise.all([
